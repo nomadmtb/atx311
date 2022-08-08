@@ -7,7 +7,7 @@ import io
 import json
 import pathlib
 import re
-from typing import Any, Dict, Callable, Optional, Tuple
+from typing import Any, Dict, Callable, Generator, Optional, Tuple
 
 import requests
 
@@ -112,7 +112,7 @@ INDEX_MAPPINGS = {
 
 def _document_to_index_name(doc: Dict[str, Any]) -> str:
     created_dt = datetime.datetime.strptime(doc["timestamp"], "%m/%d/%Y %I:%M:%S %p")
-    return f"atx311-{created_dt.year}-{created_dt.month}"
+    return f"atx311-{created_dt.year}-{created_dt.month:02d}"
 
 
 def _document_from_row(row: Dict[str, Any]) -> HydratedDocumentResponse:
@@ -125,14 +125,16 @@ def _document_from_row(row: Dict[str, Any]) -> HydratedDocumentResponse:
     return HydratedDocumentResponse(field_mapping=mapping, document=document)
 
 
-def _documents_iter(args: argparse.Namespace, chunksize=10):
+def _documents_iter(
+    args: argparse.Namespace,
+) -> Generator[HydratedDocumentResponse, None, None]:
     with open(args.path) as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
             yield _document_from_row(row)
 
 
-def _index_documents(docs_chunk: Tuple[HydratedDocumentResponse]):
+def _index_documents(docs_chunk: Tuple[HydratedDocumentResponse]) -> None:
     buffer = io.StringIO()
     for doc_res in docs_chunk:
         index = _document_to_index_name(doc_res.document)
@@ -146,7 +148,7 @@ def _index_documents(docs_chunk: Tuple[HydratedDocumentResponse]):
     res.raise_for_status()
 
 
-def _create_indexes(args: argparse.Namespace):
+def _create_indexes(args: argparse.Namespace) -> None:
     min_datetime = datetime.datetime.utcnow()
     now = datetime.datetime.utcnow()
     _docs_iterator = _documents_iter(args)
@@ -160,7 +162,7 @@ def _create_indexes(args: argparse.Namespace):
 
     for y in range(min_datetime.year, now.year + 1):
         for m in range(1, 13):
-            index = f"atx311-{y}-{m}"
+            index = f"atx311-{y}-{m:02d}"
             res = requests.put(f"{ELASTICSEARCH_ENDPOINT}/{index}", json=INDEX_MAPPINGS)
             res.raise_for_status()
 

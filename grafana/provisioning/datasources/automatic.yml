@@ -4,9 +4,10 @@ datasources:
 
 - name: atx311-elasticsearch
   type: elasticsearch
-  database: "atx311-*"
+  database: "[atx311-]YYYY-MM"
   url: http://elasticsearch:9200
   jsonData:
+    interval: Monthly
     timeField: timestamp
     logMessageField: _source
     esVersion: 7.17.3
