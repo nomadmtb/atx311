@@ -1,0 +1,150 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "target": {
+                    "limit": 100,
+                    "matchAny": false,
+                    "tags": [],
+                    "type": "dashboard"
+                },
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "datasource": {
+                "type": "elasticsearch",
+                "uid": "PDD8DC6085F990A5F"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 21,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "basemap": {
+                    "config": {},
+                    "name": "Layer 0",
+                    "type": "default"
+                },
+                "controls": {
+                    "mouseWheelZoom": true,
+                    "showAttribution": true,
+                    "showDebug": false,
+                    "showScale": false,
+                    "showZoom": true
+                },
+                "layers": [
+                    {
+                        "config": {
+                            "blur": 15,
+                            "radius": 5,
+                            "weight": {
+                                "fixed": 1,
+                                "max": 1,
+                                "min": 0
+                            }
+                        },
+                        "location": {
+                            "geohash": "sr_req_coordinates",
+                            "mode": "geohash"
+                        },
+                        "name": "Layer 1",
+                        "type": "heatmap"
+                    }
+                ],
+                "view": {
+                    "id": "coords",
+                    "lat": 30.273893,
+                    "lon": -97.739868,
+                    "zoom": 11
+                }
+            },
+            "pluginVersion": "8.3.7",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "sr_req_coordinates",
+                            "id": "2",
+                            "settings": {
+                                "precision": "11"
+                            },
+                            "type": "geohash_grid"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "elasticsearch",
+                        "uid": "PDD8DC6085F990A5F"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ],
+            "title": "ATX 311 Request Volume By Geohash",
+            "type": "geomap"
+        }
+    ],
+    "refresh": "",
+    "schemaVersion": 34,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-7d",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "ATX 311 Request Volume Map",
+    "uid": "QfwN0gm4z",
+    "version": 1,
+    "weekStart": ""
+}

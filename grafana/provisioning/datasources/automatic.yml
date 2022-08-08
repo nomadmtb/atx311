@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+
+- name: atx311-elasticsearch
+  type: elasticsearch
+  database: "atx311-*"
+  url: http://elasticsearch:9200
+  jsonData:
+    timeField: timestamp
+    logMessageField: _source
+    esVersion: 7.17.3

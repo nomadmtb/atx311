@@ -2,8 +2,6 @@ version: "3.9"
 services:
   elasticsearch:
     image: "elasticsearch:7.17.3"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data:rw
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -12,6 +10,8 @@ services:
       - xpack.security.enabled=false
   grafana:
     image: "grafana/grafana:8.3.7"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
       - "3000:3000"
     depends_on:
@@ -24,6 +24,3 @@ services:
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
     depends_on:
       - elasticsearch
-volumes:
-  esdata:
-    driver: local
