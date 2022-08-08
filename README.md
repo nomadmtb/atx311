@@ -1,4 +1,4 @@
-# ATX 311 Data (Elasticsearch + Kibana + Grafana Stack)
+# Explore Public ATX 311 Data
 
 https://data.austintexas.gov supplies public information regarding 311 requests in the
 City. This repo creates a pre-built Elasticsearch + Kibana + Grafana stack (w/ Docker)
@@ -15,8 +15,8 @@ that is able to ingest 311 data and display it.
 
 4. `$ python import.py ~/Downloads/Austin_311_Public_Data.csv`
 
-5. `open http://localhost:3000` to view Grafana (admin/admin username password).
+5. `$ open http://localhost:3000` to view Grafana (admin/admin username password).
 
-6. `open http://localhost:5601` to view Kibana too.
+6. `$ open http://localhost:5601` to view Kibana too.
 
-7. `open http://localhost:9200` Elasticsearch endpoint.
+7. `$ open http://localhost:9200` Elasticsearch endpoint.
