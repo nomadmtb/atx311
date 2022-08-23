@@ -181,10 +181,6 @@ def _import(args: argparse.Namespace, chunksize=300) -> None:
         _index_documents(chunk)
 
 
-def main(args: argparse.Namespace) -> None:
-    _import(args)
-
-
 def _ensure_path(input_data: str) -> pathlib.Path:
     path = pathlib.Path(input_data).resolve().absolute()
     if not path.exists():
@@ -198,6 +194,10 @@ def _get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = _get_args()
-    main(args)
+    _import(args)
+
+
+if __name__ == "__main__":
+    main()
