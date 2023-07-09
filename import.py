@@ -13,6 +13,7 @@ import requests
 
 
 ELASTICSEARCH_ENDPOINT = "http://localhost:9200"
+CSV_DOWNLOAD_ENDPOINT = "https://data.austintexas.gov/api/views/xwdj-i9he/rows.csv"
 
 
 @dataclasses.dataclass
@@ -125,13 +126,32 @@ def _document_from_row(row: Dict[str, Any]) -> HydratedDocumentResponse:
     return HydratedDocumentResponse(field_mapping=mapping, document=document)
 
 
-def _documents_iter(
-    args: argparse.Namespace,
+def _csv_api_iter() -> Generator[HydratedDocumentResponse, None, None]:
+    print(f'fetching latest 311 data from "{CSV_DOWNLOAD_ENDPOINT}"...')
+    with requests.get(
+        CSV_DOWNLOAD_ENDPOINT,
+        params={"accessType": "DOWNLOAD"},
+        stream=True,
+    ) as resp:
+        reader = csv.DictReader(resp.iter_lines(decode_unicode=True))
+        for row in reader:
+            yield _document_from_row(row)
+
+
+def _csv_file_iter(
+    path: pathlib.Path,
 ) -> Generator[HydratedDocumentResponse, None, None]:
-    with open(args.path) as csv_file:
+    print("fetching 311 data from local file...")
+    with open(path) as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
             yield _document_from_row(row)
+
+
+def _documents_iter(
+    args: argparse.Namespace,
+) -> Generator[HydratedDocumentResponse, None, None]:
+    return _csv_file_iter(args.path) if args.path else _csv_api_iter()
 
 
 def _index_documents(docs_chunk: Tuple[HydratedDocumentResponse]) -> None:
@@ -148,34 +168,21 @@ def _index_documents(docs_chunk: Tuple[HydratedDocumentResponse]) -> None:
     res.raise_for_status()
 
 
-def _create_indexes(args: argparse.Namespace) -> None:
-    min_datetime = datetime.datetime.utcnow()
-    now = datetime.datetime.utcnow()
-    _docs_iterator = _documents_iter(args)
-    for doc_res in _docs_iterator:
-        created_dt = datetime.datetime.strptime(
-            doc_res.document["timestamp"], "%m/%d/%Y %I:%M:%S %p"
-        )
-        if created_dt < min_datetime:
-            min_datetime = created_dt
-    print(f"minimum dt: {min_datetime}")
-
-    for y in range(min_datetime.year, now.year + 1):
-        for m in range(1, 13):
-            index = f"atx311-{y}-{m:02d}"
-            res = requests.put(f"{ELASTICSEARCH_ENDPOINT}/{index}", json=INDEX_MAPPINGS)
-            res.raise_for_status()
+def _create_index_template() -> None:
+    req_body = {"index_patterns": ["atx311-*"], **INDEX_MAPPINGS}
+    res = requests.put(f"{ELASTICSEARCH_ENDPOINT}/_template/atx311", json=req_body)
+    res.raise_for_status()
 
 
-def _import(args: argparse.Namespace, chunksize=300) -> None:
-    print("creating indexes...")
-    _create_indexes(args)
+def _import(args: argparse.Namespace, index_chunksize=250) -> None:
+    print("creating index template...")
+    _create_index_template()
 
     print("indexing documents...")
     docs_iterator = _documents_iter(args)
 
     while True:
-        chunk = tuple(itertools.islice(docs_iterator, chunksize))
+        chunk = tuple(itertools.islice(docs_iterator, index_chunksize))
         if not chunk:
             break
         _index_documents(chunk)
@@ -190,7 +197,7 @@ def _ensure_path(input_data: str) -> pathlib.Path:
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("path", help="Path to csv", type=_ensure_path)
+    parser.add_argument("--path", help="Path to csv", type=_ensure_path, required=False)
     return parser.parse_args()
 
 
