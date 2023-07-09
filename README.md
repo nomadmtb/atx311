@@ -11,12 +11,12 @@ that is able to ingest 311 data and display it.
 
 2. `$ pip install -r requirements.txt`
 
-3. `$ docker-compose up`
+3. `$ docker compose up`
 
 4. `$ python import.py ~/Downloads/Austin_311_Public_Data.csv`
 
 5. `$ open http://localhost:3000` to view Grafana (admin/admin username password).
 
-6. `$ open http://localhost:5601` to view Kibana too.
+6. `$ open http://localhost:5601` to view Kibana.
 
-7. `$ open http://localhost:9200` Elasticsearch endpoint.
+7. `$ open http://localhost:9200` to interact with the Elasticsearch API.
