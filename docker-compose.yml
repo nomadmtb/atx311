@@ -1,13 +1,13 @@
-version: "3.9"
 services:
   elasticsearch:
-    image: "elasticsearch:7.17.3"
+    image: "elasticsearch:8.16.4"
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - _JAVA_OPTIONS=-XX:UseSVE=0
   grafana:
     image: "grafana/grafana:8.3.7"
     volumes:
