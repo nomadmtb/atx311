@@ -49,6 +49,11 @@ ROW_TO_FIELD = {
         {"type": "keyword"},
         str,
     ),
+    "Owning Department": MappedField(
+        "sr_req_owning_dept",
+        {"type": "keyword"},
+        str,
+    ),
     "Method Recieved": MappedField(
         "sr_req_method_recieved",
         {"type": "keyword"},
